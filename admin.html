@@ -5,7 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Admin - Mercearia Elite</title>
   <style>
-    /* Seu CSS aqui */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #ffc107;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 6px;
+    }
+    button {
+      margin: 4px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .add { background: #28a745; color: white; }
+    .remove { background: #dc3545; color: white; }
+    .save { background: #007bff; color: white; }
+    .logout { background: #6c757d; color: white; }
+    .login {
+      max-width: 400px;
+      margin: 80px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
   </style>
 </head>
 <body>
@@ -37,12 +90,12 @@
 </div>
 
 <script>
-const token = "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"; // Coloque seu token atualizado aqui
+const token = "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"; // substitua pelo seu token válido
 const repo = "rass35/mercearia-painel";
 const filePath = "produtos.json";
 const branch = "main";
 
-// LOGIN
+// -------- LOGIN ----------
 function login() {
   const senha = document.getElementById('password').value;
   if (senha === "123") {
@@ -53,13 +106,12 @@ function login() {
     alert('Senha incorreta!');
   }
 }
-
 function logout() {
   document.getElementById('adminPanel').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'block';
 }
 
-// CRUD TABELA
+// --------- CRUD TABELA ----------
 function addRow(categoria = '', produto = '', preco = '') {
   const tbody = document.querySelector('#productTable tbody');
   const tr = document.createElement('tr');
@@ -80,25 +132,12 @@ function getTableData() {
     return {
       categoria: inputs[0].value,
       nome: inputs[1].value,
-      preco: parseFloat(inputs[2].value) || 0
+      preco: parseFloat(inputs[2].value)
     };
   });
 }
 
-// CARREGAR DADOS
-async function loadFromGitHub() {
-  const url = `https://raw.githubusercontent.com/${repo}/${branch}/${filePath}`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Arquivo não encontrado");
-    const data = await res.json();
-    data.forEach(item => addRow(item.categoria, item.nome, item.preco));
-  } catch (error) {
-    console.log('Arquivo JSON não encontrado ou vazio, começando do zero.');
-  }
-}
-
-// UPLOAD PARA GITHUB
+// --------- GITHUB INTEGRAÇÃO ----------
 async function uploadToGitHub() {
   const data = getTableData();
   if (data.length === 0) {
@@ -109,28 +148,36 @@ async function uploadToGitHub() {
   const jsonContent = JSON.stringify(data, null, 2);
   const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
+  let sha = null;
   try {
-    // Primeiro, tenta pegar o sha do arquivo existente
-    const getRes = await fetch(url, {
+    // Tenta obter o SHA do arquivo atual
+    const getRes = await fetch(url + `?ref=${branch}`, {
       headers: { Authorization: `token ${token}` }
     });
 
-    let sha = null;
-    if (getRes.ok) {
+    if (getRes.status === 200) {
       const getData = await getRes.json();
       sha = getData.sha;
-    } else if (getRes.status !== 404) {
-      alert("Erro ao acessar o arquivo no GitHub: " + getRes.status);
-      return;
+    } else if (getRes.status === 404) {
+      // Arquivo não existe ainda, vamos criar sem sha
+      sha = null;
+    } else {
+      throw new Error(`Erro ao buscar arquivo: ${getRes.status} ${getRes.statusText}`);
     }
+  } catch (err) {
+    alert("Erro ao acessar o arquivo no GitHub: " + err.message);
+    return;
+  }
 
-    const payload = {
-      message: "Atualizando produtos",
-      content: btoa(unescape(encodeURIComponent(jsonContent))),
-      branch: branch
-    };
-    if (sha) payload.sha = sha;
+  const payload = {
+    message: "Atualizando produtos",
+    content: btoa(unescape(encodeURIComponent(jsonContent))),
+    branch: branch
+  };
 
+  if (sha) payload.sha = sha;
+
+  try {
     const res = await fetch(url, {
       method: "PUT",
       headers: {
@@ -143,12 +190,26 @@ async function uploadToGitHub() {
     if (res.ok) {
       alert("✅ Arquivo publicado com sucesso no GitHub como JSON!");
     } else {
-      const errData = await res.json();
-      alert("❌ Erro ao publicar no GitHub: " + (errData.message || res.status));
+      const errorData = await res.json();
+      alert("❌ Erro ao publicar no GitHub: " + (errorData.message || res.statusText));
     }
-
   } catch (err) {
     alert("Erro na requisição: " + err.message);
+  }
+}
+
+// ---------- CARREGAR DO GITHUB ----------
+async function loadFromGitHub() {
+  const url = `https://raw.githubusercontent.com/${repo}/${branch}/${filePath}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Arquivo não encontrado');
+    const data = await res.json();
+    data.forEach(item => {
+      addRow(item.categoria, item.nome, item.preco);
+    });
+  } catch {
+    console.log('Arquivo JSON não encontrado ou vazio, começando do zero.');
   }
 }
 </script>
