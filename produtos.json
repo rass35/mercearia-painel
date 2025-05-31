@@ -1,0 +1,17 @@
+[
+  {
+    "categoria": "Padaria",
+    "nome": "Pão Francês",
+    "preco": 0.80
+  },
+  {
+    "categoria": "Bebidas",
+    "nome": "Coca-Cola 2L",
+    "preco": 8.50
+  },
+  {
+    "categoria": "Carnes",
+    "nome": "Carne Moída (Kg)",
+    "preco": 25.90
+  }
+]
