@@ -148,18 +148,31 @@ async function uploadToGitHub() {
   const jsonContent = JSON.stringify(data, null, 2);
   const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
+  let sha = null;
+  // Tenta obter o SHA do arquivo existente
   const getRes = await fetch(url, {
     headers: { Authorization: `token ${token}` }
   });
-  const getData = await getRes.json();
-  const sha = getData.sha;
+
+  if (getRes.ok) {
+    const getData = await getRes.json();
+    sha = getData.sha;
+  } else if (getRes.status === 404) {
+    // Arquivo não existe, segue sem sha
+    sha = null;
+  } else {
+    alert("Erro ao acessar o arquivo no GitHub: " + getRes.status);
+    return;
+  }
 
   const payload = {
     message: "Atualizando produtos",
     content: btoa(unescape(encodeURIComponent(jsonContent))),
     branch: branch
   };
-  if (sha) payload.sha = sha;
+  if (sha) {
+    payload.sha = sha;
+  }
 
   const res = await fetch(url, {
     method: "PUT",
@@ -173,7 +186,8 @@ async function uploadToGitHub() {
   if (res.ok) {
     alert("✅ Arquivo publicado com sucesso no GitHub como JSON!");
   } else {
-    alert("❌ Erro ao publicar no GitHub.");
+    const errText = await res.text();
+    alert("❌ Erro ao publicar no GitHub: " + res.status + "\n" + errText);
   }
 }
 
