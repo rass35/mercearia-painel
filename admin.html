@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel Admin - Mercearia Elite</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
     .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
     h1 { text-align: center; }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
@@ -14,32 +14,72 @@
     input[type="text"], input[type="number"] { width: 100%; padding: 6px; }
     button { margin: 4px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .add { background: #28a745; color: white; }
-    .remove { background: #dc3545; color: white; }
     .save { background: #007bff; color: white; }
+    .remove { background: #dc3545; color: white; }
+    .logout { background: #6c757d; color: white; }
+    .login { max-width: 400px; margin: 80px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Painel Admin - Mercearia Elite</h1>
-  <table id="productTable">
-    <thead>
-      <tr>
-        <th>Categoria</th>
-        <th>Produto</th>
-        <th>Preço (R$)</th>
-        <th>Ação</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <button class="add" onclick="addRow()">+ Adicionar Produto</button>
-  <button class="save" onclick="salvarAlteracoes()">💾 Salvar Alterações</button>
+<div id="loginScreen" class="login">
+  <h2>Login - Painel Admin</h2>
+  <input type="password" id="password" placeholder="Digite a senha" />
+  <button onclick="login()">Entrar</button>
+</div>
+
+<div id="adminPanel" style="display: none;">
+  <div class="container">
+    <h1>Painel Admin - Mercearia Elite</h1>
+    <table id="productTable">
+      <thead>
+        <tr>
+          <th>Categoria</th>
+          <th>Produto</th>
+          <th>Preço (R$)</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button class="add" onclick="addRow()">+ Adicionar Produto</button>
+    <button class="save" onclick="saveToSheet()">💾 Salvar Alterações</button>
+    <button class="logout" onclick="logout()">Sair</button>
+  </div>
 </div>
 
 <script>
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec";
 
+// LOGIN
+function login() {
+  const senha = document.getElementById('password').value;
+  if (senha === "123") {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadData();
+  } else {
+    alert('Senha incorreta!');
+  }
+}
+
+function logout() {
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+}
+
+// CARREGAR DADOS DA PLANILHA
+async function loadData() {
+  try {
+    const res = await fetch(webAppUrl);
+    const produtos = await res.json();
+    produtos.forEach(p => addRow(p.categoria, p.produto, p.preco));
+  } catch (err) {
+    alert("Erro ao carregar dados!");
+  }
+}
+
+// ADICIONAR LINHA NA TABELA
 function addRow(categoria = '', produto = '', preco = '') {
   const tbody = document.querySelector('#productTable tbody');
   const tr = document.createElement('tr');
@@ -47,41 +87,34 @@ function addRow(categoria = '', produto = '', preco = '') {
     <td><input type="text" value="${categoria}"></td>
     <td><input type="text" value="${produto}"></td>
     <td><input type="number" step="0.01" value="${preco}"></td>
-    <td><button class="remove" onclick="this.closest('tr').remove()">Remover</button></td>
+    <td><button class="remove" onclick="this.parentElement.parentElement.remove()">Remover</button></td>
   `;
   tbody.appendChild(tr);
 }
 
-function salvarAlteracoes() {
+// SALVAR DADOS NA PLANILHA
+async function saveToSheet() {
   const rows = document.querySelectorAll('#productTable tbody tr');
-  const dados = [];
-  rows.forEach(row => {
-    const categoria = row.cells[0].querySelector('input').value.trim();
-    const produto = row.cells[1].querySelector('input').value.trim();
-    const preco = row.cells[2].querySelector('input').value.trim();
-    if (categoria && produto) {
-      dados.push({ categoria, produto, preco });
-    }
+  const dados = Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return {
+      categoria: inputs[0].value,
+      produto: inputs[1].value,
+      preco: inputs[2].value
+    };
   });
 
-  fetch(webAppUrl, {
-    method: "POST",
-    body: JSON.stringify({ acao: "atualizarTudo", dados }),
-    headers: { "Content-Type": "application/json" }
-  })
-    .then(res => res.json())
-    .then(data => alert("✅ Alterações salvas com sucesso!"))
-    .catch(err => alert("❌ Erro ao salvar: " + err));
-}
-
-// Opcional: carregar dados automaticamente
-window.onload = () => {
-  fetch(webAppUrl + "?acao=ler")
-    .then(res => res.json())
-    .then(lista => {
-      lista.forEach(item => addRow(item.categoria, item.produto, item.preco));
-    })
-    .catch(err => console.error("Erro ao carregar dados:", err));
+  try {
+    const res = await fetch(webAppUrl, {
+      method: "POST",
+      body: JSON.stringify(dados),
+      headers: { "Content-Type": "application/json" }
+    });
+    const msg = await res.text();
+    alert("✅ Produtos atualizados com sucesso!");
+  } catch {
+    alert("❌ Erro ao salvar na planilha.");
+  }
 }
 </script>
 
