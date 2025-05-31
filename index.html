@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/png" href="favicon.png">
   <title>Mercearia Elite - Pedido Online</title>
   <style>
     body {
@@ -143,22 +142,10 @@
 </h1>
 
 <form id="orderForm" onsubmit="return false;">
-  <div>
-    <label for="date">Data de entrega</label>
-    <input type="date" id="date" required />
-  </div>
-  <div>
-    <label for="time">Horário desejado</label>
-    <input type="time" id="time" required />
-  </div>
-  <div>
-    <label for="name">Seu nome</label>
-    <input type="text" id="name" placeholder="Seu nome completo" required />
-  </div>
-  <div>
-    <label for="phone">Telefone</label>
-    <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required />
-  </div>
+  <div><label for="date">Data de entrega</label><input type="date" id="date" required /></div>
+  <div><label for="time">Horário desejado</label><input type="time" id="time" required /></div>
+  <div><label for="name">Seu nome</label><input type="text" id="name" placeholder="Seu nome completo" required /></div>
+  <div><label for="phone">Telefone</label><input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required /></div>
   <div>
     <label for="deliveryOption">Entrega ou Retirada</label>
     <select id="deliveryOption" required>
@@ -176,17 +163,12 @@
       <option value="Dinheiro">Dinheiro</option>
     </select>
   </div>
-  <div>
-    <label for="search">🔍 Buscar Produto</label>
-    <input type="text" id="search" placeholder="Digite para buscar...">
-  </div>
+  <div><label for="search">🔍 Buscar Produto</label><input type="text" id="search" placeholder="Digite para buscar..."></div>
 
   <button type="button" class="accordion">🛒 Selecionar Produtos</button>
   <div class="panel" id="productPanel"></div>
 
-  <div class="total-display">
-    🧾 Total: <span id="totalValue">R$ 0,00</span>
-  </div>
+  <div class="total-display">🧾 Total: <span id="totalValue">R$ 0,00</span></div>
 
   <div class="buttons">
     <button id="send">Confirmar Pedido</button>
@@ -212,45 +194,11 @@ fetch(sheetUrl)
     data.forEach(item => {
       const categoria = item.categoria;
       const nome = item.nome;
-      const preco = item.preco;
+      const preco = parseFloat(item.preco);
 
       if (!categories[categoria]) categories[categoria] = [];
-      categories[categoria].push({ name: nome, price: parseFloat(preco) });
+      categories[categoria].push({ name: nome, price: preco });
     });
-
-    let index = 0;
-    for (const [category, items] of Object.entries(categories)) {
-      const section = document.createElement('div');
-      section.className = 'category';
-      section.innerHTML = `<h3>${category}</h3>`;
-      const grid = document.createElement('div');
-      grid.className = 'products-grid';
-
-      items.forEach(p => {
-        products.push(p);
-        const div = document.createElement('div');
-        div.className = 'product-card';
-        div.innerHTML = `
-          <label>${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
-          <input type="number" min="0" value="0" id="prod-${index}">
-        `;
-        grid.appendChild(div);
-        index++;
-      });
-
-      section.appendChild(grid);
-      productPanel.appendChild(section);
-    }
-
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-      input.addEventListener('input', updateTotalDisplay);
-    });
-
-    if (localStorage.getItem('lastOrder')) {
-      document.getElementById('repeat').style.display = 'block';
-    }
-  });
-
 
     let index = 0;
     for (const [category, items] of Object.entries(categories)) {
@@ -369,7 +317,6 @@ document.getElementById('repeat').addEventListener('click', () => {
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('date').min = today;
 
-// 🔍 Filtro de busca
 const searchInput = document.getElementById('search');
 searchInput.addEventListener('input', () => {
   const searchTerm = searchInput.value.toLowerCase();
@@ -379,7 +326,6 @@ searchInput.addEventListener('input', () => {
   });
 });
 
-// 🕘 Salvar último pedido
 function saveLastOrder() {
   const order = {
     date: document.getElementById('date').value,
@@ -395,7 +341,6 @@ function saveLastOrder() {
   localStorage.setItem('lastOrder', JSON.stringify(order));
 }
 
-// 🔄 Carregar último pedido
 function loadLastOrder() {
   const saved = JSON.parse(localStorage.getItem('lastOrder'));
   if (!saved) return;
