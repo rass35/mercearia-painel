@@ -1,17 +1,62 @@
 [
-  {
-    "categoria": "Padaria",
-    "nome": "Pão Francês",
-    "preco": 0.80
-  },
-  {
-    "categoria": "Bebidas",
-    "nome": "Coca-Cola 2L",
-    "preco": 8.50
-  },
-  {
-    "categoria": "Carnes",
-    "nome": "Carne Moída (Kg)",
-    "preco": 25.90
-  }
+  { "categoria": "Padaria", "nome": "Pão Francês", "preco": "0.70" },
+  { "categoria": "Padaria", "nome": "Pão de Forma", "preco": "6.50" },
+  { "categoria": "Padaria", "nome": "Pão Doce", "preco": "2.50" },
+  { "categoria": "Padaria", "nome": "Rosca de Coco", "preco": "8.00" },
+  { "categoria": "Padaria", "nome": "Bolo de Chocolate", "preco": "15.00" },
+  { "categoria": "Padaria", "nome": "Biscoito de Polvilho", "preco": "4.50" },
+  { "categoria": "Padaria", "nome": "Pão Integral", "preco": "7.00" },
+  { "categoria": "Padaria", "nome": "Bolo de Milho", "preco": "12.00" },
+  { "categoria": "Padaria", "nome": "Croissant", "preco": "5.00" },
+  { "categoria": "Padaria", "nome": "Pão de Queijo", "preco": "1.50" },
+
+  { "categoria": "Mercearia", "nome": "Arroz 5kg", "preco": "22.90" },
+  { "categoria": "Mercearia", "nome": "Feijão 1kg", "preco": "7.90" },
+  { "categoria": "Mercearia", "nome": "Açúcar 1kg", "preco": "4.50" },
+  { "categoria": "Mercearia", "nome": "Óleo de Soja 900ml", "preco": "7.90" },
+  { "categoria": "Mercearia", "nome": "Macarrão Espaguete", "preco": "5.50" },
+  { "categoria": "Mercearia", "nome": "Farinha de Trigo 1kg", "preco": "5.00" },
+  { "categoria": "Mercearia", "nome": "Sal 1kg", "preco": "3.00" },
+  { "categoria": "Mercearia", "nome": "Café 500g", "preco": "16.00" },
+  { "categoria": "Mercearia", "nome": "Molho de Tomate", "preco": "3.50" },
+  { "categoria": "Mercearia", "nome": "Extrato de Tomate", "preco": "5.50" },
+  { "categoria": "Mercearia", "nome": "Milho Verde Lata", "preco": "4.50" },
+  { "categoria": "Mercearia", "nome": "Ervilha Lata", "preco": "4.50" },
+  { "categoria": "Mercearia", "nome": "Sardinha Lata", "preco": "6.50" },
+  { "categoria": "Mercearia", "nome": "Atum Lata", "preco": "7.50" },
+  { "categoria": "Mercearia", "nome": "Leite Condensado", "preco": "5.50" },
+  { "categoria": "Mercearia", "nome": "Creme de Leite", "preco": "4.50" },
+
+  { "categoria": "Limpeza", "nome": "Sabão em Pó 1kg", "preco": "9.90" },
+  { "categoria": "Limpeza", "nome": "Detergente 500ml", "preco": "3.50" },
+  { "categoria": "Limpeza", "nome": "Desinfetante 500ml", "preco": "4.50" },
+  { "categoria": "Limpeza", "nome": "Água Sanitária 1L", "preco": "3.90" },
+  { "categoria": "Limpeza", "nome": "Sabão em Barra (5un)", "preco": "7.50" },
+  { "categoria": "Limpeza", "nome": "Esponja de Aço", "preco": "2.50" },
+  { "categoria": "Limpeza", "nome": "Pano de Chão", "preco": "3.00" },
+  { "categoria": "Limpeza", "nome": "Rodo", "preco": "10.00" },
+  { "categoria": "Limpeza", "nome": "Vassoura", "preco": "15.00" },
+  { "categoria": "Limpeza", "nome": "Saco de Lixo 30L", "preco": "5.00" },
+
+  { "categoria": "Laticínios", "nome": "Leite Integral 1L", "preco": "5.50" },
+  { "categoria": "Laticínios", "nome": "Leite Desnatado 1L", "preco": "5.50" },
+  { "categoria": "Laticínios", "nome": "Iogurte 170g", "preco": "2.50" },
+  { "categoria": "Laticínios", "nome": "Queijo Mussarela 100g", "preco": "4.90" },
+  { "categoria": "Laticínios", "nome": "Queijo Prato 100g", "preco": "5.50" },
+  { "categoria": "Laticínios", "nome": "Manteiga 200g", "preco": "9.50" },
+  { "categoria": "Laticínios", "nome": "Requeijão 200g", "preco": "7.90" },
+  { "categoria": "Laticínios", "nome": "Creme de Ricota", "preco": "8.90" },
+  { "categoria": "Laticínios", "nome": "Leite Fermentado", "preco": "3.50" },
+  { "categoria": "Laticínios", "nome": "Queijo Minas 100g", "preco": "6.90" },
+
+  { "categoria": "Carnes", "nome": "Frango Inteiro kg", "preco": "9.90" },
+  { "categoria": "Carnes", "nome": "Coxa e Sobrecoxa kg", "preco": "12.90" },
+  { "categoria": "Carnes", "nome": "Peito de Frango kg", "preco": "16.90" },
+  { "categoria": "Carnes", "nome": "Carne Moída kg", "preco": "22.90" },
+  { "categoria": "Carnes", "nome": "Acém kg", "preco": "24.90" },
+  { "categoria": "Carnes", "nome": "Contrafilé kg", "preco": "42.90" },
+  { "categoria": "Carnes", "nome": "Linguiça Toscana kg", "preco": "19.90" },
+  { "categoria": "Carnes", "nome": "Linguiça Calabresa kg", "preco": "22.90" },
+  { "categoria": "Carnes", "nome": "Bacon kg", "preco": "29.90" },
+  { "categoria": "Carnes", "nome": "Carne de Porco kg", "preco": "21.90" }
 ]
