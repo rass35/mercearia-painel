@@ -5,24 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel Admin - Mercearia Elite</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 20px; }
-    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
-    h1 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #ffc107; }
-    button { margin: 4px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .add { background: #28a745; color: white; }
-    .remove { background: #dc3545; color: white; }
-    .edit { background: #007bff; color: white; }
-    #loginBox { max-width: 300px; margin: 100px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); text-align: center; }
-    #loginBox input { width: 100%; padding: 10px; margin-top: 10px; }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #ffcc70, #ff6f61);
+      margin: 0;
+      padding: 0;
+    }
+    #loginBox {
+      max-width: 350px;
+      margin: 100px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    #loginBox h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    #loginBox input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    #loginBox button {
+      width: 100%;
+      padding: 12px;
+      background: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    #loginBox button:hover {
+      background: #e65a50;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #ffc107;
+    }
+    button {
+      margin: 4px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .add {
+      background: #28a745;
+      color: white;
+    }
+    .remove {
+      background: #dc3545;
+      color: white;
+    }
+    .edit {
+      background: #007bff;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
 <div id="loginBox">
-  <h2>Login</h2>
+  <h2>Login - Mercearia Elite</h2>
   <input type="password" id="senha" placeholder="Digite a senha" />
   <button onclick="verificarSenha()">Entrar</button>
 </div>
@@ -66,7 +144,7 @@ function lerProdutos() {
       const tbody = document.querySelector('#productTable tbody');
       tbody.innerHTML = '';
       data.slice(1).forEach((row, index) => {
-        const linha = index + 2; // para mapear a linha correta na planilha
+        const linha = index + 2; // mapeia a linha na planilha
         tbody.innerHTML += `
           <tr>
             <td>${row[0]}</td>
@@ -81,7 +159,7 @@ function lerProdutos() {
     });
 }
 
-// Adiciona novo produto
+// Adiciona produto
 function adicionarProduto() {
   const categoria = prompt("Categoria:");
   const produto = prompt("Produto:");
@@ -100,7 +178,7 @@ function removerProduto(row) {
   }
 }
 
-// Editar produto
+// Edita produto
 function editarProduto(row, categoriaAtual, produtoAtual, precoAtual) {
   const categoria = prompt("Nova Categoria:", categoriaAtual);
   const produto = prompt("Novo Produto:", produtoAtual);
