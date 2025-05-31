@@ -2,33 +2,21 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Admin - Mercearia Elite</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 20px; }
     .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
     h1 { text-align: center; }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background: #ffc107; }
-    input[type="text"], input[type="number"] { width: 100%; padding: 6px; }
     button { margin: 4px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .add { background: #28a745; color: white; }
-    .save { background: #007bff; color: white; }
     .remove { background: #dc3545; color: white; }
-    .logout { background: #6c757d; color: white; }
-    .login { max-width: 400px; margin: 80px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body>
-
-<div id="loginScreen" class="login">
-  <h2>Login - Painel Admin</h2>
-  <input type="password" id="password" placeholder="Digite a senha" />
-  <button onclick="login()">Entrar</button>
-</div>
-
-<div id="adminPanel" style="display: none;">
   <div class="container">
     <h1>Painel Admin - Mercearia Elite</h1>
     <table id="productTable">
@@ -42,80 +30,51 @@
       </thead>
       <tbody></tbody>
     </table>
-    <button class="add" onclick="addRow()">+ Adicionar Produto</button>
-    <button class="save" onclick="saveToSheet()">💾 Salvar Alterações</button>
-    <button class="logout" onclick="logout()">Sair</button>
+    <button class="add" onclick="adicionarProduto()">+ Adicionar Produto</button>
   </div>
-</div>
 
 <script>
-const webAppUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec";
+const apiUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec"; // substitua pela sua URL do Google Apps Script
 
-// LOGIN
-function login() {
-  const senha = document.getElementById('password').value;
-  if (senha === "123") {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-    loadData();
-  } else {
-    alert('Senha incorreta!');
-  }
-}
-
-function logout() {
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'block';
-}
-
-// CARREGAR DADOS DA PLANILHA
-async function loadData() {
-  try {
-    const res = await fetch(webAppUrl);
-    const produtos = await res.json();
-    produtos.forEach(p => addRow(p.categoria, p.produto, p.preco));
-  } catch (err) {
-    alert("Erro ao carregar dados!");
-  }
-}
-
-// ADICIONAR LINHA NA TABELA
-function addRow(categoria = '', produto = '', preco = '') {
-  const tbody = document.querySelector('#productTable tbody');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><input type="text" value="${categoria}"></td>
-    <td><input type="text" value="${produto}"></td>
-    <td><input type="number" step="0.01" value="${preco}"></td>
-    <td><button class="remove" onclick="this.parentElement.parentElement.remove()">Remover</button></td>
-  `;
-  tbody.appendChild(tr);
-}
-
-// SALVAR DADOS NA PLANILHA
-async function saveToSheet() {
-  const rows = document.querySelectorAll('#productTable tbody tr');
-  const dados = Array.from(rows).map(row => {
-    const inputs = row.querySelectorAll('input');
-    return {
-      categoria: inputs[0].value,
-      produto: inputs[1].value,
-      preco: inputs[2].value
-    };
-  });
-
-  try {
-    const res = await fetch(webAppUrl, {
-      method: "POST",
-      body: JSON.stringify(dados),
-      headers: { "Content-Type": "application/json" }
+// Carrega produtos da planilha
+function lerProdutos() {
+  fetch(apiUrl + "?action=read")
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector('#productTable tbody');
+      tbody.innerHTML = '';
+      data.slice(1).forEach((row, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${row[0]}</td>
+            <td>${row[1]}</td>
+            <td>${row[2]}</td>
+            <td><button class="remove" onclick="removerProduto(${index + 2})">Remover</button></td>
+          </tr>`;
+      });
     });
-    const msg = await res.text();
-    alert("✅ Produtos atualizados com sucesso!");
-  } catch {
-    alert("❌ Erro ao salvar na planilha.");
+}
+
+// Adiciona novo produto na planilha
+function adicionarProduto() {
+  const categoria = prompt("Categoria:");
+  const produto = prompt("Produto:");
+  const preco = prompt("Preço:");
+  if (!categoria || !produto || !preco) return alert("Preencha todos os campos.");
+
+  fetch(`${apiUrl}?action=create&categoria=${encodeURIComponent(categoria)}&produto=${encodeURIComponent(produto)}&preco=${encodeURIComponent(preco)}`)
+    .then(() => lerProdutos());
+}
+
+// Remove produto pela linha (começando da 2)
+function removerProduto(row) {
+  if (confirm("Deseja remover este produto?")) {
+    fetch(`${apiUrl}?action=delete&row=${row}`)
+      .then(() => lerProdutos());
   }
 }
+
+window.onload = lerProdutos;
 </script>
 
 </body>
