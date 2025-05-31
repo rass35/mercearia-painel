@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel Admin - Mercearia Elite</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 20px; }
@@ -14,29 +14,51 @@
     button { margin: 4px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .add { background: #28a745; color: white; }
     .remove { background: #dc3545; color: white; }
+    .edit { background: #007bff; color: white; }
+    #loginBox { max-width: 300px; margin: 100px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); text-align: center; }
+    #loginBox input { width: 100%; padding: 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Painel Admin - Mercearia Elite</h1>
-    <table id="productTable">
-      <thead>
-        <tr>
-          <th>Categoria</th>
-          <th>Produto</th>
-          <th>Preço (R$)</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <button class="add" onclick="adicionarProduto()">+ Adicionar Produto</button>
-  </div>
+
+<div id="loginBox">
+  <h2>Login</h2>
+  <input type="password" id="senha" placeholder="Digite a senha" />
+  <button onclick="verificarSenha()">Entrar</button>
+</div>
+
+<div class="container" id="painel" style="display: none;">
+  <h1>Painel Admin - Mercearia Elite</h1>
+  <table id="productTable">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Produto</th>
+        <th>Preço (R$)</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="add" onclick="adicionarProduto()">+ Adicionar Produto</button>
+</div>
 
 <script>
-const apiUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec"; // substitua pela sua URL do Google Apps Script
+const apiUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec";
 
-// Carrega produtos da planilha
+// Login
+function verificarSenha() {
+  const senha = document.getElementById('senha').value;
+  if (senha === "123") {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('painel').style.display = 'block';
+    lerProdutos();
+  } else {
+    alert("Senha incorreta!");
+  }
+}
+
+// Carrega produtos
 function lerProdutos() {
   fetch(apiUrl + "?action=read")
     .then(res => res.json())
@@ -44,18 +66,22 @@ function lerProdutos() {
       const tbody = document.querySelector('#productTable tbody');
       tbody.innerHTML = '';
       data.slice(1).forEach((row, index) => {
+        const linha = index + 2; // para mapear a linha correta na planilha
         tbody.innerHTML += `
           <tr>
             <td>${row[0]}</td>
             <td>${row[1]}</td>
             <td>${row[2]}</td>
-            <td><button class="remove" onclick="removerProduto(${index + 2})">Remover</button></td>
+            <td>
+              <button class="edit" onclick="editarProduto(${linha}, '${row[0]}', '${row[1]}', '${row[2]}')">Editar</button>
+              <button class="remove" onclick="removerProduto(${linha})">Remover</button>
+            </td>
           </tr>`;
       });
     });
 }
 
-// Adiciona novo produto na planilha
+// Adiciona novo produto
 function adicionarProduto() {
   const categoria = prompt("Categoria:");
   const produto = prompt("Produto:");
@@ -66,7 +92,7 @@ function adicionarProduto() {
     .then(() => lerProdutos());
 }
 
-// Remove produto pela linha (começando da 2)
+// Remove produto
 function removerProduto(row) {
   if (confirm("Deseja remover este produto?")) {
     fetch(`${apiUrl}?action=delete&row=${row}`)
@@ -74,7 +100,16 @@ function removerProduto(row) {
   }
 }
 
-window.onload = lerProdutos;
+// Editar produto
+function editarProduto(row, categoriaAtual, produtoAtual, precoAtual) {
+  const categoria = prompt("Nova Categoria:", categoriaAtual);
+  const produto = prompt("Novo Produto:", produtoAtual);
+  const preco = prompt("Novo Preço:", precoAtual);
+  if (!categoria || !produto || !preco) return alert("Todos os campos devem ser preenchidos.");
+
+  fetch(`${apiUrl}?action=update&row=${row}&categoria=${encodeURIComponent(categoria)}&produto=${encodeURIComponent(produto)}&preco=${encodeURIComponent(preco)}`)
+    .then(() => lerProdutos());
+}
 </script>
 
 </body>
