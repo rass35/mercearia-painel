@@ -5,60 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel Admin - Mercearia Elite</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.15);
-    }
-    h1 {
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background: #ffc107;
-    }
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 6px;
-    }
-    button {
-      margin: 4px;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    /* mesmo estilo do seu código original */
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 20px; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #ffc107; }
+    input[type="text"], input[type="number"] { width: 100%; padding: 6px; }
+    button { margin: 4px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .add { background: #28a745; color: white; }
     .remove { background: #dc3545; color: white; }
     .save { background: #007bff; color: white; }
     .logout { background: #6c757d; color: white; }
-    .login {
-      max-width: 400px;
-      margin: 80px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.15);
-    }
+    .login { max-width: 400px; margin: 80px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body>
@@ -90,12 +50,12 @@
 </div>
 
 <script>
-const token = "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"; // substitua pelo seu token válido
+const token = "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"; // Atualize com seu token válido
 const repo = "rass35/mercearia-painel";
-const filePath = "produtos.json";
+const filePath = "produtos.md"; // agora vamos salvar como Markdown
 const branch = "main";
 
-// -------- LOGIN ----------
+// LOGIN
 function login() {
   const senha = document.getElementById('password').value;
   if (senha === "123") {
@@ -111,11 +71,10 @@ function logout() {
   document.getElementById('loginScreen').style.display = 'block';
 }
 
-// --------- CRUD TABELA ----------
+// CRUD TABELA
 function addRow(categoria = '', produto = '', preco = '') {
   const tbody = document.querySelector('#productTable tbody');
   const tr = document.createElement('tr');
-
   tr.innerHTML = `
     <td><input type="text" value="${categoria}"></td>
     <td><input type="text" value="${produto}"></td>
@@ -130,86 +89,89 @@ function getTableData() {
   return Array.from(rows).map(row => {
     const inputs = row.querySelectorAll('input');
     return {
-      categoria: inputs[0].value,
-      nome: inputs[1].value,
-      preco: parseFloat(inputs[2].value)
+      categoria: inputs[0].value.trim(),
+      nome: inputs[1].value.trim(),
+      preco: parseFloat(inputs[2].value) || 0
     };
-  });
+  }).filter(item => item.categoria && item.nome); // filtra produtos vazios
 }
 
-// --------- GITHUB INTEGRAÇÃO ----------
+// CONVERTE DADOS PARA MARKDOWN
+function toMarkdown(data) {
+  let md = "# Produtos da Mercearia Elite\n\n";
+  data.forEach(item => {
+    md += `- Categoria: **${item.categoria}** | Produto: **${item.nome}** | Preço: R$ ${item.preco.toFixed(2)}\n`;
+  });
+  return md;
+}
+
+// UPLOAD NO GITHUB
 async function uploadToGitHub() {
   const data = getTableData();
   if (data.length === 0) {
     alert("Adicione pelo menos um produto.");
     return;
   }
-
-  const jsonContent = JSON.stringify(data, null, 2);
+  const markdownContent = toMarkdown(data);
   const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
+  // Primeiro, buscar o SHA do arquivo atual para atualizar (se existir)
   let sha = null;
   try {
-    // Tenta obter o SHA do arquivo atual
-    const getRes = await fetch(url + `?ref=${branch}`, {
+    const getRes = await fetch(url, {
       headers: { Authorization: `token ${token}` }
     });
-
-    if (getRes.status === 200) {
+    if (getRes.ok) {
       const getData = await getRes.json();
       sha = getData.sha;
-    } else if (getRes.status === 404) {
-      // Arquivo não existe ainda, vamos criar sem sha
-      sha = null;
-    } else {
-      throw new Error(`Erro ao buscar arquivo: ${getRes.status} ${getRes.statusText}`);
     }
   } catch (err) {
-    alert("Erro ao acessar o arquivo no GitHub: " + err.message);
-    return;
+    console.warn("Arquivo não encontrado, será criado novo.");
   }
 
+  // Criar o payload para o PUT
   const payload = {
-    message: "Atualizando produtos",
-    content: btoa(unescape(encodeURIComponent(jsonContent))),
+    message: "Atualizando produtos em Markdown",
+    content: btoa(unescape(encodeURIComponent(markdownContent))),
     branch: branch
   };
-
   if (sha) payload.sha = sha;
 
-  try {
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+  // Enviar PUT
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `token ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
 
-    if (res.ok) {
-      alert("✅ Arquivo publicado com sucesso no GitHub como JSON!");
-    } else {
-      const errorData = await res.json();
-      alert("❌ Erro ao publicar no GitHub: " + (errorData.message || res.statusText));
-    }
-  } catch (err) {
-    alert("Erro na requisição: " + err.message);
+  if (res.ok) {
+    alert("✅ Arquivo Markdown publicado com sucesso no GitHub!");
+  } else {
+    const errorData = await res.json();
+    alert("❌ Erro ao publicar no GitHub: " + (errorData.message || res.statusText));
   }
 }
 
-// ---------- CARREGAR DO GITHUB ----------
+// CARREGAR DO GITHUB
 async function loadFromGitHub() {
   const url = `https://raw.githubusercontent.com/${repo}/${branch}/${filePath}`;
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Arquivo não encontrado');
-    const data = await res.json();
-    data.forEach(item => {
-      addRow(item.categoria, item.nome, item.preco);
+    if (!res.ok) throw new Error("Arquivo não encontrado");
+    const text = await res.text();
+    // Parse simples do Markdown para tabela (ex: linha "- Categoria: Frutas | Produto: Banana | Preço: R$ 3.50")
+    const lines = text.split('\n').filter(l => l.startsWith('- Categoria:'));
+    lines.forEach(line => {
+      const match = line.match(/- Categoria: \*\*(.+?)\*\* \| Produto: \*\*(.+?)\*\* \| Preço: R\$ ([0-9.,]+)/);
+      if (match) {
+        addRow(match[1], match[2], parseFloat(match[3].replace(',', '.')));
+      }
     });
   } catch {
-    console.log('Arquivo JSON não encontrado ou vazio, começando do zero.');
+    console.log('Arquivo Markdown não encontrado ou vazio, começando do zero.');
   }
 }
 </script>
