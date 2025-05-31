@@ -11,70 +11,78 @@
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background: #ffc107; }
+    input[type="text"], input[type="number"] { width: 100%; padding: 6px; }
     button { margin: 4px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .add { background: #28a745; color: white; }
     .remove { background: #dc3545; color: white; }
+    .save { background: #007bff; color: white; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Painel Admin - Mercearia Elite</h1>
-    <table id="productTable">
-      <thead>
-        <tr>
-          <th>Categoria</th>
-          <th>Produto</th>
-          <th>Preço (R$)</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <button class="add" onclick="adicionarProduto()">+ Adicionar Produto</button>
-  </div>
+
+<div class="container">
+  <h1>Painel Admin - Mercearia Elite</h1>
+  <table id="productTable">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Produto</th>
+        <th>Preço (R$)</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="add" onclick="addRow()">+ Adicionar Produto</button>
+  <button class="save" onclick="salvarAlteracoes()">💾 Salvar Alterações</button>
+</div>
 
 <script>
-const apiUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec"; // substitua pela sua URL do Google Apps Script
+const webAppUrl = "https://script.google.com/macros/s/AKfycbxw_QkZJsZuxj9D4RiE6p0GROUulTsNTv2EjCtsfhiK6wVSisZG86M5XFhVo-g6CFMYBw/exec";
 
-// Carrega produtos da planilha
-function lerProdutos() {
-  fetch(apiUrl + "?action=read")
+function addRow(categoria = '', produto = '', preco = '') {
+  const tbody = document.querySelector('#productTable tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" value="${categoria}"></td>
+    <td><input type="text" value="${produto}"></td>
+    <td><input type="number" step="0.01" value="${preco}"></td>
+    <td><button class="remove" onclick="this.closest('tr').remove()">Remover</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function salvarAlteracoes() {
+  const rows = document.querySelectorAll('#productTable tbody tr');
+  const dados = [];
+  rows.forEach(row => {
+    const categoria = row.cells[0].querySelector('input').value.trim();
+    const produto = row.cells[1].querySelector('input').value.trim();
+    const preco = row.cells[2].querySelector('input').value.trim();
+    if (categoria && produto) {
+      dados.push({ categoria, produto, preco });
+    }
+  });
+
+  fetch(webAppUrl, {
+    method: "POST",
+    body: JSON.stringify({ acao: "atualizarTudo", dados }),
+    headers: { "Content-Type": "application/json" }
+  })
     .then(res => res.json())
-    .then(data => {
-      const tbody = document.querySelector('#productTable tbody');
-      tbody.innerHTML = '';
-      data.slice(1).forEach((row, index) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
-            <td>${row[2]}</td>
-            <td><button class="remove" onclick="removerProduto(${index + 2})">Remover</button></td>
-          </tr>`;
-      });
-    });
+    .then(data => alert("✅ Alterações salvas com sucesso!"))
+    .catch(err => alert("❌ Erro ao salvar: " + err));
 }
 
-// Adiciona novo produto na planilha
-function adicionarProduto() {
-  const categoria = prompt("Categoria:");
-  const produto = prompt("Produto:");
-  const preco = prompt("Preço:");
-  if (!categoria || !produto || !preco) return alert("Preencha todos os campos.");
-
-  fetch(`${apiUrl}?action=create&categoria=${encodeURIComponent(categoria)}&produto=${encodeURIComponent(produto)}&preco=${encodeURIComponent(preco)}`)
-    .then(() => lerProdutos());
+// Opcional: carregar dados automaticamente
+window.onload = () => {
+  fetch(webAppUrl + "?acao=ler")
+    .then(res => res.json())
+    .then(lista => {
+      lista.forEach(item => addRow(item.categoria, item.produto, item.preco));
+    })
+    .catch(err => console.error("Erro ao carregar dados:", err));
 }
-
-// Remove produto pela linha (começando da 2)
-function removerProduto(row) {
-  if (confirm("Deseja remover este produto?")) {
-    fetch(`${apiUrl}?action=delete&row=${row}`)
-      .then(() => lerProdutos());
-  }
-}
-
-window.onload = lerProdutos;
 </script>
 
 </body>
