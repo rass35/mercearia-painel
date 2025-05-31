@@ -90,9 +90,9 @@
 </div>
 
 <script>
-const token = "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";
+const token = "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"; // substitua por um token válido
 const repo = "rass35/mercearia-painel";
-const filePath = "produtos.csv";
+const filePath = "produtos.json"; // salvando como JSON agora
 const branch = "main";
 
 // -------- LOGIN ----------
@@ -131,8 +131,8 @@ function getTableData() {
     const inputs = row.querySelectorAll('input');
     return {
       categoria: inputs[0].value,
-      produto: inputs[1].value,
-      preco: inputs[2].value
+      nome: inputs[1].value,
+      preco: parseFloat(inputs[2].value)
     };
   });
 }
@@ -145,9 +145,7 @@ async function uploadToGitHub() {
     return;
   }
 
-  const csvContent = 'Categoria,Produto,Preço\n' + 
-    data.map(d => `${d.categoria},${d.produto},${d.preco}`).join('\n');
-
+  const jsonContent = JSON.stringify(data, null, 2);
   const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
   const getRes = await fetch(url, {
@@ -158,7 +156,7 @@ async function uploadToGitHub() {
 
   const payload = {
     message: "Atualizando produtos",
-    content: btoa(unescape(encodeURIComponent(csvContent))),
+    content: btoa(unescape(encodeURIComponent(jsonContent))),
     branch: branch
   };
   if (sha) payload.sha = sha;
@@ -173,7 +171,7 @@ async function uploadToGitHub() {
   });
 
   if (res.ok) {
-    alert("✅ Arquivo publicado com sucesso no GitHub!");
+    alert("✅ Arquivo publicado com sucesso no GitHub como JSON!");
   } else {
     alert("❌ Erro ao publicar no GitHub.");
   }
@@ -184,14 +182,12 @@ async function loadFromGitHub() {
   const url = `https://raw.githubusercontent.com/${repo}/${branch}/${filePath}`;
   try {
     const res = await fetch(url);
-    const text = await res.text();
-    const lines = text.trim().split('\n').slice(1);
-    lines.forEach(line => {
-      const [categoria, produto, preco] = line.split(',');
-      addRow(categoria, produto, preco);
+    const data = await res.json();
+    data.forEach(item => {
+      addRow(item.categoria, item.nome, item.preco);
     });
   } catch {
-    console.log('Arquivo não encontrado, começando vazio.');
+    console.log('Arquivo JSON não encontrado ou vazio, começando do zero.');
   }
 }
 </script>
