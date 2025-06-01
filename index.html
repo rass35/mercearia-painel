@@ -76,7 +76,21 @@ fetch(`${sheetUrl}?_=${Date.now()}`)
     }
   });
 
-// ... resto do JavaScript permanece igual ...
+function calculateTotal() {
+  let total = 0;
+  products.forEach((p, idx) => {
+    const qty = Number(document.getElementById(`prod-${idx}`).value);
+    if (qty > 0) total += p.price * qty;
+  });
+  return total;
+}
+
+function updateTotalDisplay() {
+  const total = calculateTotal();
+  document.getElementById('totalValue').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+// ... restante do código JavaScript permanece igual ...
 </script>
 
 </body>
