@@ -205,12 +205,14 @@ let products = [];
 const productPanel = document.getElementById('productPanel');
 const whatsappNumber = '5521972654357';
 
-fetch(${sheetUrl}?_=${Date.now()})
+fetch(`${sheetUrl}?_=${Date.now()}`)
   .then(response => response.json())
   .then(categories => {
+    let index = 0;
+    for (const [category, items] of Object.entries(categories)) {
       const section = document.createElement('div');
       section.className = 'category';
-      section.innerHTML = <h3>${category}</h3>;
+      section.innerHTML = `<h3>${category}</h3>`;
       const grid = document.createElement('div');
       grid.className = 'products-grid';
 
@@ -218,10 +220,10 @@ fetch(${sheetUrl}?_=${Date.now()})
         products.push(p);
         const div = document.createElement('div');
         div.className = 'product-card';
-        div.innerHTML = 
+        div.innerHTML = `
           <label>${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
           <input type="number" min="0" value="0" id="prod-${index}">
-        ;
+        `;
         grid.appendChild(div);
         index++;
       });
@@ -238,6 +240,7 @@ fetch(${sheetUrl}?_=${Date.now()})
       document.getElementById('repeat').style.display = 'block';
     }
   });
+</script>
 
 
     let index = 0;
