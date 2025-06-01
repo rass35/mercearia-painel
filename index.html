@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mercearia Elite - Pedido Online</title>
-  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="icon" href="favicon.png" type="image/png" />
   <style>
     body {
       background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
@@ -21,6 +21,9 @@
       margin-bottom: 1.2rem;
       font-weight: 700;
       text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     form {
       max-width: 1100px;
@@ -38,7 +41,12 @@
       display: block;
       margin-bottom: 0.3rem;
     }
-    select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"], input[type="number"] {
+    select,
+    input[type="date"],
+    input[type="time"],
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"] {
       width: 100%;
       padding: 0.5rem 0.7rem;
       border-radius: 8px;
@@ -89,7 +97,7 @@
       border: 1px solid #ddd;
       padding: 0.8rem;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
     .product-card label {
       font-weight: bold;
@@ -118,12 +126,24 @@
       color: white;
       transition: background-color 0.3s ease;
     }
-    button#send { background-color: #28a745; }
-    button#send:hover { background-color: #218838; }
-    button#clear { background-color: #dc3545; }
-    button#clear:hover { background-color: #c82333; }
-    button#repeat { background-color: #007bff; }
-    button#repeat:hover { background-color: #0069d9; }
+    button#send {
+      background-color: #28a745;
+    }
+    button#send:hover {
+      background-color: #218838;
+    }
+    button#clear {
+      background-color: #dc3545;
+    }
+    button#clear:hover {
+      background-color: #c82333;
+    }
+    button#repeat {
+      background-color: #007bff;
+    }
+    button#repeat:hover {
+      background-color: #0069d9;
+    }
     .confirmation {
       background-color: #d4edda;
       color: #155724;
@@ -137,272 +157,283 @@
 </head>
 <body>
 
-<h1 style="display: flex; align-items: center; gap: 10px;">
-  <img src="logo.png" alt="Logo" style="height:130px;">
-  MERCEARIA ELITE
-</h1>
+  <h1>
+    <img src="logo.png" alt="Logo" style="height:130px;" />
+    MERCEARIA ELITE
+  </h1>
 
-<form id="orderForm" onsubmit="return false;">
-  <div>
-    <label for="date">Data de entrega</label>
-    <input type="date" id="date" required />
-  </div>
-  <div>
-    <label for="time">Horário desejado</label>
-    <input type="time" id="time" required />
-  </div>
-  <div>
-    <label for="name">Seu nome</label>
-    <input type="text" id="name" placeholder="Seu nome completo" required />
-  </div>
-  <div>
-    <label for="phone">Telefone</label>
-    <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required />
-  </div>
-  <div>
-    <label for="deliveryOption">Entrega ou Retirada</label>
-    <select id="deliveryOption" required>
-      <option value="">Selecione</option>
-      <option value="Entrega">🚚 Entrega</option>
-      <option value="Retirada">🏪 Retirada na loja</option>
-    </select>
-  </div>
-  <div>
-    <label for="payment">Forma de pagamento</label>
-    <select id="payment" required>
-      <option value="">Selecione</option>
-      <option value="PIX">PIX</option>
-      <option value="Cartão">Cartão</option>
-      <option value="Dinheiro">Dinheiro</option>
-    </select>
-  </div>
-  <div>
-    <label for="search">🔍 Buscar Produto</label>
-    <input type="text" id="search" placeholder="Digite para buscar...">
+  <form id="orderForm" onsubmit="return false;">
+    <div>
+      <label for="date">Data de entrega</label>
+      <input type="date" id="date" required />
+    </div>
+    <div>
+      <label for="time">Horário desejado</label>
+      <input type="time" id="time" required />
+    </div>
+    <div>
+      <label for="name">Seu nome</label>
+      <input type="text" id="name" placeholder="Seu nome completo" required />
+    </div>
+    <div>
+      <label for="phone">Telefone</label>
+      <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required />
+    </div>
+    <div>
+      <label for="deliveryOption">Entrega ou Retirada</label>
+      <select id="deliveryOption" required>
+        <option value="">Selecione</option>
+        <option value="Entrega">🚚 Entrega</option>
+        <option value="Retirada">🏪 Retirada na loja</option>
+      </select>
+    </div>
+    <div>
+      <label for="payment">Forma de pagamento</label>
+      <select id="payment" required>
+        <option value="">Selecione</option>
+        <option value="PIX">PIX</option>
+        <option value="Cartão">Cartão</option>
+        <option value="Dinheiro">Dinheiro</option>
+      </select>
+    </div>
+    <div>
+      <label for="search">🔍 Buscar Produto</label>
+      <input type="text" id="search" placeholder="Digite para buscar..." />
+    </div>
+
+    <button type="button" class="accordion">🛒 Selecionar Produtos</button>
+    <div class="panel" id="productPanel"></div>
+
+    <div class="total-display">
+      🧾 Total: <span id="totalValue">R$ 0,00</span>
+    </div>
+
+    <div class="buttons">
+      <button id="send" type="button">Confirmar Pedido</button>
+      <button id="clear" type="button">Limpar</button>
+      <button id="repeat" type="button" style="display:none;">🔄 Repetir Último Pedido</button>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmationMessage">
+    ✅ Seu pedido foi enviado com sucesso! Aguarde nossa confirmação no WhatsApp.
   </div>
 
-  <button type="button" class="accordion">🛒 Selecionar Produtos</button>
-  <div class="panel" id="productPanel"></div>
+  <script>
+    const sheetUrl = 'https://script.google.com/macros/s/AKfycbwShNP-IN2FzV4HVj9oeQFdXUrMJhendEXdpBVbh4cNNM-lWXobJuijWPrxlNyLXe9geQ/exec';
+    let products = [];
+    const productPanel = document.getElementById('productPanel');
+    const whatsappNumber = '5521972654357';
 
-  <div class="total-display">
-    🧾 Total: <span id="totalValue">R$ 0,00</span>
-  </div>
+    // Busca os produtos da planilha e monta o painel
+    fetch(`${sheetUrl}?_=${Date.now()}`)
+      .then((response) => response.json())
+      .then((categories) => {
+        let index = 0;
+        for (const [category, items] of Object.entries(categories)) {
+          const section = document.createElement('div');
+          section.className = 'category';
+          section.innerHTML = `<h3>${category}</h3>`;
+          const grid = document.createElement('div');
+          grid.className = 'products-grid';
 
-  <div class="buttons">
-    <button id="send">Confirmar Pedido</button>
-    <button id="clear" type="button">Limpar</button>
-    <button id="repeat" type="button" style="display:none;">🔄 Repetir Último Pedido</button>
-  </div>
-</form>
+          items.forEach((p) => {
+            products.push(p);
+            const div = document.createElement('div');
+            div.className = 'product-card';
+            div.innerHTML = `
+              <label for="prod-${index}">${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
+              <input type="number" min="0" value="0" id="prod-${index}" />
+            `;
+            grid.appendChild(div);
+            index++;
+          });
 
-<div class="confirmation" id="confirmationMessage">
-  ✅ Seu pedido foi enviado com sucesso! Aguarde nossa confirmação no WhatsApp.
-</div>
+          section.appendChild(grid);
+          productPanel.appendChild(section);
+        }
 
-<script>
-const sheetUrl = 'https://script.google.com/macros/s/AKfycbwShNP-IN2FzV4HVj9oeQFdXUrMJhendEXdpBVbh4cNNM-lWXobJuijWPrxlNyLXe9geQ/exec';
-let products = [];
-const productPanel = document.getElementById('productPanel');
-const whatsappNumber = '5521972654357';
+        // Adiciona evento de input para atualizar total
+        document.querySelectorAll('input[type="number"]').forEach((input) => {
+          input.addEventListener('input', updateTotalDisplay);
+        });
 
-fetch(${sheetUrl}?_=${Date.now()})
-  .then(response => response.json())
-  .then(categories => {
-      const section = document.createElement('div');
-      section.className = 'category';
-      section.innerHTML = <h3>${category}</h3>;
-      const grid = document.createElement('div');
-      grid.className = 'products-grid';
-
-      items.forEach(p => {
-        products.push(p);
-        const div = document.createElement('div');
-        div.className = 'product-card';
-        div.innerHTML = 
-          <label>${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
-          <input type="number" min="0" value="0" id="prod-${index}">
-        ;
-        grid.appendChild(div);
-        index++;
+        // Mostrar botão de repetir pedido se existir no localStorage
+        if (localStorage.getItem('lastOrder')) {
+          document.getElementById('repeat').style.display = 'inline-block';
+        }
+      })
+      .catch((error) => {
+        productPanel.innerHTML = '<p>Erro ao carregar produtos. Tente novamente mais tarde.</p>';
+        console.error('Erro ao buscar produtos:', error);
       });
 
-      section.appendChild(grid);
-      productPanel.appendChild(section);
-    }
-
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-      input.addEventListener('input', updateTotalDisplay);
+    // Accordion toggle
+    document.querySelector('.accordion').addEventListener('click', () => {
+      const panel = document.querySelector('.panel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     });
 
-    if (localStorage.getItem('lastOrder')) {
-      document.getElementById('repeat').style.display = 'block';
+    // Busca no campo buscar
+    document.getElementById('search').addEventListener('input', (e) => {
+      const filter = e.target.value.toLowerCase();
+      document.querySelectorAll('.product-card').forEach((card) => {
+        const label = card.querySelector('label').innerText.toLowerCase();
+        card.style.display = label.includes(filter) ? 'block' : 'none';
+      });
+    });
+
+    // Atualiza valor total no display
+    function updateTotalDisplay() {
+      let total = 0;
+      document.querySelectorAll('input[type="number"]').forEach((input, idx) => {
+        const qtd = parseInt(input.value) || 0;
+        total += qtd * products[idx].price;
+      });
+      document.getElementById('totalValue').innerText = formatReal(total);
     }
-  });
 
+    // Formata número para real brasileiro
+    function formatReal(value) {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
 
-    let index = 0;
-    for (const [category, items] of Object.entries(categories)) {
-      const section = document.createElement('div');
-      section.className = 'category';
-      section.innerHTML = <h3>${category}</h3>;
-      const grid = document.createElement('div');
-      grid.className = 'products-grid';
+    // Monta mensagem para WhatsApp
+    function buildMessage() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const deliveryOption = document.getElementById('deliveryOption').value;
+      const payment = document.getElementById('payment').value;
 
-      items.forEach(p => {
-        products.push(p);
-        const div = document.createElement('div');
-        div.className = 'product-card';
-        div.innerHTML = 
-          <label>${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
-          <input type="number" min="0" value="0" id="prod-${index}">
-        ;
-        grid.appendChild(div);
-        index++;
+      let itemsText = '';
+      let total = 0;
+      document.querySelectorAll('input[type="number"]').forEach((input, idx) => {
+        const qty = parseInt(input.value) || 0;
+        if (qty > 0) {
+          const product = products[idx];
+          const subTotal = qty * product.price;
+          total += subTotal;
+          itemsText += `*${qty}x* ${product.name} – R$${subTotal.toFixed(2).replace('.', ',')}\n`;
+        }
       });
 
-      section.appendChild(grid);
-      productPanel.appendChild(section);
+      if (!itemsText) return null; // Nenhum produto selecionado
+
+      const totalFormatted = formatReal(total);
+
+      const message = 
+`*Pedido de ${name}*  
+📅 Entrega: ${date}  
+⏰ Horário: ${time}  
+🚚 Opção: ${deliveryOption}  
+💳 Pagamento: ${payment}  
+
+🛍️ Produtos:  
+${itemsText}  
+*Total: ${totalFormatted}*  
+
+📞 Telefone: ${phone}`;
+
+      return encodeURIComponent(message);
     }
 
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-      input.addEventListener('input', updateTotalDisplay);
+    // Envia pedido para WhatsApp
+    document.getElementById('send').addEventListener('click', () => {
+      const message = buildMessage();
+
+      if (!message) {
+        alert('Por favor, selecione pelo menos um produto para fazer o pedido.');
+        return;
+      }
+
+      // Valida campos obrigatórios
+      if (!document.getElementById('name').value.trim()) {
+        alert('Por favor, informe seu nome.');
+        return;
+      }
+      if (!document.getElementById('phone').value.trim()) {
+        alert('Por favor, informe seu telefone.');
+        return;
+      }
+      if (!document.getElementById('date').value) {
+        alert('Por favor, informe a data de entrega.');
+        return;
+      }
+      if (!document.getElementById('time').value) {
+        alert('Por favor, informe o horário desejado.');
+        return;
+      }
+      if (!document.getElementById('deliveryOption').value) {
+        alert('Por favor, selecione entrega ou retirada.');
+        return;
+      }
+      if (!document.getElementById('payment').value) {
+        alert('Por favor, selecione a forma de pagamento.');
+        return;
+      }
+
+      // Guarda pedido no localStorage para repetição
+      localStorage.setItem('lastOrder', JSON.stringify({
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        deliveryOption: document.getElementById('deliveryOption').value,
+        payment: document.getElementById('payment').value,
+        products: Array.from(document.querySelectorAll('input[type="number"]')).map((input) => parseInt(input.value) || 0)
+      }));
+
+      // Exibe botão repetir pedido
+      document.getElementById('repeat').style.display = 'inline-block';
+
+      // Abre WhatsApp com a mensagem
+      const url = `https://wa.me/${whatsappNumber}?text=${message}`;
+      window.open(url, '_blank');
+
+      // Exibe confirmação
+      document.getElementById('confirmationMessage').style.display = 'block';
+
+      // Opcional: limpar form após pedido
+      // clearForm();
     });
 
-    if (localStorage.getItem('lastOrder')) {
-      document.getElementById('repeat').style.display = 'block';
+    // Limpa formulário
+    document.getElementById('clear').addEventListener('click', () => {
+      clearForm();
+    });
+
+    function clearForm() {
+      document.getElementById('orderForm').reset();
+      document.querySelectorAll('input[type="number"]').forEach((input) => (input.value = '0'));
+      updateTotalDisplay();
+      document.getElementById('confirmationMessage').style.display = 'none';
     }
-  });
 
-function calculateTotal() {
-  let total = 0;
-  products.forEach((p, idx) => {
-    const qty = Number(document.getElementById(prod-${idx}).value);
-    if (qty > 0) total += p.price * qty;
-  });
-  return total;
-}
+    // Repetir último pedido
+    document.getElementById('repeat').addEventListener('click', () => {
+      const lastOrder = JSON.parse(localStorage.getItem('lastOrder'));
+      if (!lastOrder) return;
 
-function updateTotalDisplay() {
-  const total = calculateTotal();
-  document.getElementById('totalValue').innerText = R$ ${total.toFixed(2).replace('.', ',')};
-}
+      document.getElementById('name').value = lastOrder.name;
+      document.getElementById('phone').value = lastOrder.phone;
+      document.getElementById('date').value = lastOrder.date;
+      document.getElementById('time').value = lastOrder.time;
+      document.getElementById('deliveryOption').value = lastOrder.deliveryOption;
+      document.getElementById('payment').value = lastOrder.payment;
 
-document.querySelector('.accordion').addEventListener('click', () => {
-  const panel = document.querySelector('.panel');
-  panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-});
+      document.querySelectorAll('input[type="number"]').forEach((input, idx) => {
+        input.value = lastOrder.products[idx] || 0;
+      });
 
-document.getElementById('send').addEventListener('click', () => {
-  const date = document.getElementById('date').value;
-  const time = document.getElementById('time').value;
-  const name = document.getElementById('name').value;
-  const phone = document.getElementById('phone').value;
-  const payment = document.getElementById('payment').value;
-  const deliveryOption = document.getElementById('deliveryOption').value;
+      updateTotalDisplay();
 
-  let productList = '';
-  let total = 0;
+      // Mostra painel para edição
+      productPanel.style.display = 'block';
+    });
 
-  products.forEach((p, idx) => {
-    const qty = Number(document.getElementById(prod-${idx}).value);
-    if (qty > 0) {
-      const subtotal = p.price * qty;
-      productList += • *${p.name}* x${qty} – R$ ${subtotal.toFixed(2).replace('.', ',')}\n;
-      total += subtotal;
-    }
-  });
-
-  let deliveryFee = deliveryOption === 'Entrega' ? (total >= 10 ? 0 : 3) : 0;
-  const totalWithDelivery = total + deliveryFee;
-
-  const msg = 
-🛍️ *Pedido na Mercearia Elite*
-
-📅 *Data:* ${date}
-⏰ *Horário:* ${time}
-
-👤 *Cliente:* ${name}  
-📞 *Telefone:* ${phone}  
-📍 *Tipo:* ${deliveryOption}  
-
-🛒 *Produtos:*
-${productList || 'Nenhum produto selecionado'}
-
-💰 *Subtotal:* R$ ${total.toFixed(2).replace('.', ',')}
-🚚 *Taxa de Entrega:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}
-💵 *Total Geral:* R$ ${totalWithDelivery.toFixed(2).replace('.', ',')}
-💳 *Forma de Pagamento:* ${payment}
-
-Aguardo a confirmação! ✅;
-
-  const url = https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)};
-  window.open(url, '_blank');
-
-  saveLastOrder();
-  document.getElementById('confirmationMessage').style.display = 'block';
-});
-
-document.getElementById('clear').addEventListener('click', () => {
-  document.getElementById('orderForm').reset();
-  document.getElementById('confirmationMessage').style.display = 'none';
-  document.querySelector('.panel').style.display = 'none';
-  updateTotalDisplay();
-});
-
-document.getElementById('repeat').addEventListener('click', () => {
-  loadLastOrder();
-  document.querySelector('.panel').style.display = 'block';
-});
-
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('date').min = today;
-
-// 🔍 Filtro de busca
-const searchInput = document.getElementById('search');
-searchInput.addEventListener('input', () => {
-  const searchTerm = searchInput.value.toLowerCase();
-  document.querySelectorAll('.product-card').forEach(card => {
-    const label = card.querySelector('label').innerText.toLowerCase();
-    card.style.display = label.includes(searchTerm) ? 'block' : 'none';
-  });
-});
-
-// 🕘 Salvar último pedido
-function saveLastOrder() {
-  const order = {
-    date: document.getElementById('date').value,
-    time: document.getElementById('time').value,
-    name: document.getElementById('name').value,
-    phone: document.getElementById('phone').value,
-    payment: document.getElementById('payment').value,
-    deliveryOption: document.getElementById('deliveryOption').value,
-    products: products.map((p, idx) => ({
-      qty: Number(document.getElementById(prod-${idx}).value)
-    }))
-  };
-  localStorage.setItem('lastOrder', JSON.stringify(order));
-}
-
-// 🔄 Carregar último pedido
-function loadLastOrder() {
-  const saved = JSON.parse(localStorage.getItem('lastOrder'));
-  if (!saved) return;
-
-  document.getElementById('date').value = saved.date;
-  document.getElementById('time').value = saved.time;
-  document.getElementById('name').value = saved.name;
-  document.getElementById('phone').value = saved.phone;
-  document.getElementById('payment').value = saved.payment;
-  document.getElementById('deliveryOption').value = saved.deliveryOption;
-
-  saved.products.forEach((p, idx) => {
-    const input = document.getElementById(prod-${idx});
-    if (input) input.value = p.qty;
-  });
-
-  updateTotalDisplay();
-}
-</script>
+  </script>
 
 </body>
 </html>
