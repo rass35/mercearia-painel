@@ -299,45 +299,57 @@
     }
 
     // Monta mensagem para WhatsApp
-    function buildMessage() {
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-      const deliveryOption = document.getElementById('deliveryOption').value;
-      const payment = document.getElementById('payment').value;
+    // Monta mensagem para WhatsApp no formato solicitado
+function buildMessage() {
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  const deliveryOption = document.getElementById('deliveryOption').value;
+  const payment = document.getElementById('payment').value;
 
-      let itemsText = '';
-      let total = 0;
-      document.querySelectorAll('input[type="number"]').forEach((input, idx) => {
-        const qty = parseInt(input.value) || 0;
-        if (qty > 0) {
-          const product = products[idx];
-          const subTotal = qty * product.price;
-          total += subTotal;
-          itemsText += `*${qty}x* ${product.name} – R$${subTotal.toFixed(2).replace('.', ',')}\n`;
-        }
-      });
+  let productList = '';
+  let subtotal = 0;
 
-      if (!itemsText) return null; // Nenhum produto selecionado
-
-      const totalFormatted = formatReal(total);
-
-      const message = 
-`*Pedido de ${name}*  
-📅 Entrega: ${date}  
-⏰ Horário: ${time}  
-🚚 Opção: ${deliveryOption}  
-💳 Pagamento: ${payment}  
-
-🛍️ Produtos:  
-${itemsText}  
-*Total: ${totalFormatted}*  
-
-📞 Telefone: ${phone}`;
-
-      return encodeURIComponent(message);
+  document.querySelectorAll('input[type="number"]').forEach((input, idx) => {
+    const qty = parseInt(input.value) || 0;
+    if (qty > 0) {
+      const product = products[idx];
+      const subTotalProduct = qty * product.price;
+      subtotal += subTotalProduct;
+      productList += `*${qty}x* ${product.name} – R$ ${subTotalProduct.toFixed(2).replace('.', ',')}\n`;
     }
+  });
+
+  if (!productList) productList = 'Nenhum produto selecionado';
+
+  // Define a taxa de entrega (exemplo: 10 reais para entrega, 0 para retirada)
+  const deliveryFee = deliveryOption === 'Entrega' ? 10 : 0;
+  const totalWithDelivery = subtotal + deliveryFee;
+
+  const msg = 
+`🛍️ *Pedido na Mercearia Elite*
+
+📅 *Data:* ${date}
+⏰ *Horário:* ${time}
+
+👤 *Cliente:* ${name}  
+📞 *Telefone:* ${phone}  
+📍 *Tipo:* ${deliveryOption}  
+
+🛒 *Produtos:*
+${productList}
+
+💰 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}
+🚚 *Taxa de Entrega:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}
+💵 *Total Geral:* R$ ${totalWithDelivery.toFixed(2).replace('.', ',')}
+💳 *Forma de Pagamento:* ${payment}
+
+Aguardo a confirmação! ✅`;
+
+  return encodeURIComponent(msg);
+}
+
 
     // Envia pedido para WhatsApp
     document.getElementById('send').addEventListener('click', () => {
