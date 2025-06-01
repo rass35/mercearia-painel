@@ -200,23 +200,47 @@
 </div>
 
 <script>
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRfAvoG1Yj8p9A1ozTQn9jgAXGjzWGB8gfZkR3r9UMG8dPTpsx176kYY3evmiPE9vZ75PWFjIk4EwcM/pub?output=csv';
+const sheetUrl = 'https://script.google.com/macros/s/AKfycbwShNP-IN2FzV4HVj9oeQFdXUrMJhendEXdpBVbh4cNNM-lWXobJuijWPrxlNyLXe9geQ/exec';
 let products = [];
 const productPanel = document.getElementById('productPanel');
 const whatsappNumber = '5521972654357';
 
-fetch(sheetUrl)
-  .then(response => response.text())
-  .then(data => {
-    const rows = data.split('\n').slice(1);
-    const categories = {};
-    rows.forEach(row => {
-      const [categoria, nome, preco] = row.split(',').map(item => item.trim().replace(/"/g, ''));
-      if (nome && preco) {
-        if (!categories[categoria]) categories[categoria] = [];
-        categories[categoria].push({ name: nome, price: parseFloat(preco.replace(',', '.')) });
-      }
+fetch(`${sheetUrl}?_=${Date.now()}`)
+  .then(response => response.json())
+  .then(categories => {
+    let index = 0;
+    for (const [category, items] of Object.entries(categories)) {
+      const section = document.createElement('div');
+      section.className = 'category';
+      section.innerHTML = `<h3>${category}</h3>`;
+      const grid = document.createElement('div');
+      grid.className = 'products-grid';
+
+      items.forEach(p => {
+        products.push(p);
+        const div = document.createElement('div');
+        div.className = 'product-card';
+        div.innerHTML = `
+          <label>${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
+          <input type="number" min="0" value="0" id="prod-${index}">
+        `;
+        grid.appendChild(div);
+        index++;
+      });
+
+      section.appendChild(grid);
+      productPanel.appendChild(section);
+    }
+
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+      input.addEventListener('input', updateTotalDisplay);
     });
+
+    if (localStorage.getItem('lastOrder')) {
+      document.getElementById('repeat').style.display = 'block';
+    }
+  });
+
 
     let index = 0;
     for (const [category, items] of Object.entries(categories)) {
